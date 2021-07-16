@@ -11,14 +11,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #include "matriz.h"
+#include "utils.h"
 
 int main ()
 {
 	int tamanho;
 	real_t *resi;
-	real_t tTotal[2];
+	double *tTotal;
 
 	Matriz_t *SL;
 	SL = lerMatriz();
@@ -30,13 +30,33 @@ int main ()
 
 	//IMPRIMIR ORIGINAL
 	
+	resi = (real_t *) malloc(tamanho*sizeof(real_t));
 
+	tTotal = (double *) malloc(tamanho*sizeof(double));
 
-	//decomposicaoLUpivoteamento(SL,tTotal);
-	decomposicaoLU(SL,tTotal);
+	for(int i=0; i<tamanho;i++){
+		resi[i]=0;
+		tTotal[i] = 0;
+	}
 
-	// PROBLEMÃO AQUI
-	resi = normaL2residuo(original,SL,resi); 
+	
+	float teste	= 1.0 / 0;
+	printf("%f\n",teste );
+	if (isinf(teste)&& isnan(teste)){ 
+		printf("Ocorreram perações com zero",teste);
+	}
+
+	double time = timestamp();
+	decomposicaoLUpivoteamento(SL,tTotal);
+    double elapsed = timestamp() - time;
+    tTotal[2] += elapsed;
+
+	//double time = timestamp();
+	//decomposicaoLU(SL,tTotal);
+    //double elapsed = timestamp() - time;
+    //tTotal[2] += elapsed;
+
+	normaL2residuo(original,SL,resi); 
 
 
 	printf("%d\n",tamanho );
@@ -44,10 +64,14 @@ int main ()
 	printf("#\n");
 	prnMatriz(SL); //SL agora é a inversa
 	printf("###########\n");
-	printf("# Tempo Triangularização: %.5g milissegundos. \n",tTotal[0]+tTotal[1]);
+	printf("# Tempo Triangularização: %.5g milissegundos. \n",tTotal[2]);
 	printf("# Tempo cálculo de Y: %.5g milissegundos. \n",tTotal[0]);
 	printf("# Tempo cálculo de X: %.5g milissegundos. \n", tTotal[1]);
-	printf("# Norma L2 do Residuo: %g\n",resi);
+	printf("# Norma L2 do Residuo:");
+	for(int i=0; i<tamanho;i++){
+		printf("%g ",resi[i]);
+	}
+	printf("\n");
 	printf("###########\n");
 	
 }
