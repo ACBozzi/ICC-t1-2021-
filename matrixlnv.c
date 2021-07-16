@@ -17,7 +17,7 @@
 int main ()
 {
 	int tamanho;
-	real_t *res;
+	real_t *resi;
 	real_t tTotal[2];
 
 	Matriz_t *SL;
@@ -35,7 +35,8 @@ int main ()
 	//decomposicaoLUpivoteamento(SL,tTotal);
 	decomposicaoLU(SL,tTotal);
 
-	res = normaL2residuo(original,SL); 
+	// PROBLEMÃO AQUI
+	resi = normaL2residuo(original,SL,resi); 
 
 
 	printf("%d\n",tamanho );
@@ -46,7 +47,7 @@ int main ()
 	printf("# Tempo Triangularização: %.5g milissegundos. \n",tTotal[0]+tTotal[1]);
 	printf("# Tempo cálculo de Y: %.5g milissegundos. \n",tTotal[0]);
 	printf("# Tempo cálculo de X: %.5g milissegundos. \n", tTotal[1]);
-	printf("# Norma L2 do Residuo: %g\n",res);
+	printf("# Norma L2 do Residuo: %g\n",resi);
 	printf("###########\n");
 	
 }
