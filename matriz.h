@@ -28,7 +28,7 @@ void prnMatriz (Matriz_t *matriz);
 void prnVetor (real_t *vet, unsigned int n);
 
 int calculaDeterminante(Matriz_t *matriz, int determ);
-real_t* normaL2residuo(Matriz_t *original, Matriz_t *inversa);
+real_t* normaL2residuo(Matriz_t *original, Matriz_t *inversa, real_t *resi);
 
 //cálculo da decomṕsição de A em LU
 int decomposicaoLU (Matriz_t *matriz, real_t *tTotal);
