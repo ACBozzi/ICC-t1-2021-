@@ -113,14 +113,15 @@ int calculaDeterminante(Matriz_t *matriz, int determ){
 }
 
 //####################CALCULA A NORMA DO RESIDUO####################
-real_t *normaL2residuo(Matriz_t *original, Matriz_t *inversa){
+real_t *normaL2residuo(Matriz_t *original, Matriz_t *inversa, real_t *resi){
 	//multiplicar a original pela inversa ai obtem uma matriz
+	
 	real_t aux;
 	Matriz_t* obtida;
 	bool res = true;
 	int tam = original->n;
 	obtida = alocaMatriz(tam);
-	real_t *residuo = (real_t *) malloc(tam*sizeof(real_t));
+	//real_t *resi = (real_t *) malloc(tam*sizeof(real_t));
 	double soma = 0;
 
 	for (int linha = 0;linha<tam;linha++){
@@ -153,6 +154,13 @@ real_t *normaL2residuo(Matriz_t *original, Matriz_t *inversa){
 		}
 	}
 
+	for (int i = 0; i<tam;i++){
+		for(int j =0 ;j<tam;j++){
+			printf("%f ",obtida->A[j][i]);
+		}
+		printf("\n");
+	}
+
 	if (res==false){
 		printf("Vai ter residuo\n");
 		for (int i = 0; i<tam;i++){
@@ -160,7 +168,7 @@ real_t *normaL2residuo(Matriz_t *original, Matriz_t *inversa){
 				soma += obtida->A[j][i] - ident->A[j][i];
 			}
 			soma = sqrt(soma);
-			residuo[i] = soma;
+			resi[i] = soma;
 		}
 	}else
 		return 0;
