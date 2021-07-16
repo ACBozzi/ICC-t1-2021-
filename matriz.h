@@ -31,20 +31,20 @@ int calculaDeterminante(Matriz_t *matriz, int determ);
 real_t* normaL2residuo(Matriz_t *original, Matriz_t *inversa, real_t *resi);
 
 //cálculo da decomṕsição de A em LU
-int decomposicaoLU (Matriz_t *matriz, real_t *tTotal);
+int decomposicaoLU (Matriz_t *matriz, double *tTotal);
 
 //cálculo da inversa dados L e U
-Matriz_t *inversa(Matriz_t *L, Matriz_t *matriz, int n,real_t *tTotal);
+int inversa(Matriz_t *L, Matriz_t *matriz, int n,double *tTotal);
 
 //solução de ly=b
-real_t* triangSuperior(Matriz_t *matriz, real_t *y,real_t *tx);
+real_t* triangSuperior(Matriz_t *matriz, real_t *y,double *tx);
 //solução de ux=y
-real_t* triangInferior(Matriz_t *L, real_t *x,real_t *ty);
+real_t* triangInferior(Matriz_t *L, real_t *x,double *ty);
 
 //cálculo da fatoração com pivoteamento parcial, busca de máximo e troca de linhass
 int encontraMax(Matriz_t *matriz, int n,int linha, int coluna);
 Matriz_t* trocaLinhas(Matriz_t *matriz, int linha_pivo, int coluna);
-int decomposicaoLUpivoteamento(Matriz_t *matriz, real_t *tTotal);
+int decomposicaoLUpivoteamento(Matriz_t *matriz, double *tTotal);
 
 //real_t normaL2residuo(Matriz_t *original, Matriz_t *inversa);
 
