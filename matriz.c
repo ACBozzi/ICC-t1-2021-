@@ -17,15 +17,6 @@
 #include "utils.h"
 #include<stdbool.h>
 
-//Função de marcação de tempo
-double timestamp(void)
-{
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  return((double)(tp.tv_sec*1000.0 + tp.tv_usec/1000.0));
-}
-
-
 // Exibe a matriz na saída padrão
 void prnMatriz (Matriz_t *matriz)
 {
@@ -41,7 +32,8 @@ void prnMatriz (Matriz_t *matriz)
 //Leitura de matrizes da Entrada padrão(stdin)
 //retorna uma matriz.
 //caso erro retorna NULL
-Matriz_t *lerMatriz (){
+Matriz_t *lerMatriz ()
+{
 
  	int n;
 
@@ -61,7 +53,7 @@ Matriz_t *lerMatriz (){
 	//se leu e alocou corretamente retorna a matriz  
   	if (matriz){
     	return matriz;
-  	}else
+    }
   	//se não leu corretamente retorna nulo
     return NULL;
 }
@@ -121,8 +113,9 @@ real_t *normaL2residuo(Matriz_t *original, Matriz_t *inversa, real_t *resi){
 	bool res = true;
 	int tam = original->n;
 	obtida = alocaMatriz(tam);
-	//real_t *resi = (real_t *) malloc(tam*sizeof(real_t));
+	
 	double soma = 0;
+
 
 	for (int linha = 0;linha<tam;linha++){
 		for(int coluna = 0;coluna<tam;coluna++){
@@ -154,31 +147,25 @@ real_t *normaL2residuo(Matriz_t *original, Matriz_t *inversa, real_t *resi){
 		}
 	}
 
-	for (int i = 0; i<tam;i++){
-		for(int j =0 ;j<tam;j++){
-			printf("%f ",obtida->A[j][i]);
-		}
-		printf("\n");
-	}
-
 	if (res==false){
-		printf("Vai ter residuo\n");
 		for (int i = 0; i<tam;i++){
+			soma = 0;
 			for(int j =0 ;j<tam;j++){
-				soma += obtida->A[j][i] - ident->A[j][i];
+				soma += fabs(obtida->A[j][i] - ident->A[j][i]);
 			}
 			soma = sqrt(soma);
 			resi[i] = soma;
 		}
 	}else
+
 		return 0;
 }
 
 
 //####################SOLUÇÃO SISTEMA TRIANGULAR INFERIOR(LY=B)####################
-real_t* triangInferior(Matriz_t *L, real_t *x, real_t *ty){
+real_t* triangInferior(Matriz_t *L, real_t *x, double *ty){
  
-  ty[0] = timestamp();
+  //ty[0] += timestamp();
   int n=L->n; //tamanho da matriz L -> decomposição Lu
 
   real_t *y = (real_t *) malloc(n * sizeof(real_t)); // vetor de solução Y
@@ -190,19 +177,19 @@ real_t* triangInferior(Matriz_t *L, real_t *x, real_t *ty){
     for(int coluna = 0; coluna <=linha;coluna++){
       soma += L->A[linha][coluna]*y[coluna];
     }
-    y[linha] = x[linha]-soma/(L->A[linha][linha]);
+    y[linha] = (x[linha]-soma)/(L->A[linha][linha]);
   }
 
-  ty[0] = timestamp() - ty[0];
+  //ty[0] = timestamp() - ty[0];
 
   return y;
 } //OK
 
 
 //####################SOLUÇÃO SISTEMA TRIANGULAR SUPERIOR(UX=Y)####################
-real_t* triangSuperior(Matriz_t *U, real_t *y,real_t *tx){
+real_t* triangSuperior(Matriz_t *U, real_t *y,double *tx){
 
-  tx[1] = timestamp();
+  //tx[1] += timestamp();
   int n=U->n; //tamanho da matriz U - > decomposição lU
 
   real_t *x = (real_t *) malloc(n * sizeof(real_t)); //vetor de solução X
@@ -215,19 +202,20 @@ real_t* triangSuperior(Matriz_t *U, real_t *y,real_t *tx){
     for(int coluna = linha; coluna <= n ;coluna++){
       soma += U->A[linha][coluna]*x[coluna];
     }
-    x[linha] = (y[linha]-(soma))/U->A[linha][linha];
+    x[linha] = (y[linha]-(soma))/U->A[linha][linha]; //ver se pode ter um zero
   }
 
-  tx[1] = timestamp()-tx[1];
+  //tx[1] = timestamp()-tx[1];
   return x;
  
 }//OK
 
 
 //####################CÁLCULO DA INVERSA DADO L E U DA DECOMPOSIÇÃO LU####################
- Matriz_t *inversa(Matriz_t *L, Matriz_t *U,int n,real_t *tTotal){
+ int inversa(Matriz_t *L, Matriz_t *U,int n,double *tTotal){
 
   int linha, coluna;
+  double time, elapsed;
   real_t  soma;
   real_t *y = (real_t *) malloc(n * sizeof(real_t));
   real_t *x = (real_t *) malloc(n * sizeof(real_t));
@@ -256,9 +244,18 @@ real_t* triangSuperior(Matriz_t *U, real_t *y,real_t *tx){
       x[lin] = ident->A[lin][col];
     }
 
-    y = triangInferior(L,x,tTotal); //chama a função para a solução de (LY=B)
 
+    time = timestamp();
+    y = triangInferior(L,x,tTotal); //chama a função para a solução de (LY=B)
+    elapsed = timestamp() - time;
+    tTotal[0] += elapsed;
+
+
+    time = timestamp();
     x = triangSuperior(U,y,tTotal); // chama a função para a solução de (UX=Y) passando y, calculado acima
+    elapsed = timestamp() - time;
+    tTotal[1] += elapsed;
+
 
     for (int i=0;i<n;i++){
       inversa->A[i][j]=x[i];  // a inversa recebe a coluna n da solução (UXn=Y)
@@ -278,7 +275,7 @@ real_t* triangSuperior(Matriz_t *U, real_t *y,real_t *tx){
 
 
 //####################DECOMPOSIÇÃO DE UMA MATRIZ A EM LU (A=LU)####################
-int decomposicaoLU(Matriz_t *matriz, real_t *tTotal){
+int decomposicaoLU(Matriz_t *matriz, double *tTotal){
 	
 	unsigned int n = matriz->n;
 	int coluna, linha;
@@ -349,7 +346,7 @@ int encontraMax(Matriz_t *matriz, int n,int linha, int coluna){
 
 
 //####DECOMPOSIÇÃO DE UMA MATRIZ A EM LU (A=LU) UTILIZANDO A TÉCNICA DE PIVOTEAMENTO PARCIAL########
-int decomposicaoLUpivoteamento(Matriz_t *matriz, real_t *tTotal){
+int decomposicaoLUpivoteamento(Matriz_t *matriz, double *tTotal){
 
   unsigned int n = matriz->n;
   int linha_pivo, coluna, i ;
